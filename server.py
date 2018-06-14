@@ -44,6 +44,7 @@ class GameInstance:
         self.items = {}
         #example item load
         self.items.update({self.counter_items: Item(300, 400, 3)})
+        self.counter_items += 1
     
     def ping(self, s):
         b = bytes("b", "utf-8")
@@ -95,17 +96,19 @@ class GameInstance:
 
     def pick(self, s, ip):
         try:
-            a = str(s).split(",")
+            a = str(s, "utf-8").split(",")
             player = self.players[self.ips_to_ids[ip]]
             radius = 50
-            if player.x-50 < self.items[a[0]].x < player.x+50:
+            id_, slot = int(a[0]), int(a[1])
+            if player.x-radius < self.items[id_].x < player.x+radius:
                 print("i")
-                if player.y-50 < self.items[a[0]].y < player.y+50:
+                if player.y-radius < self.items[id_].y < player.y+radius:
                     print("j")
-                    self.items[a[0]].pick(player)
-                    if not(player.inventory[int(a[1])] == None):
-                        player.inventory[int(a[1])].update({int(a[1]): self.items[a[0]]})
-                        return bytes("ic%s", "utf-8")+s
+                    self.items[id_].pick(player)
+                    if player.inventory[slot] == None:
+                        print("gowno")
+                        player.inventory.update({slot: self.items[id_]})
+                        return bytes("ic", "utf-8")+s
         except KeyError:
             pass
         return bytes("ir", "utf-8")+s
