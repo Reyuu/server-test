@@ -1,0 +1,60 @@
+should never exceed 64 bytes
+always three numbers after dec point, always separated by < , >
+except for the first letter for send
+except for the two letters for recv
+
+send:
+    <action_letter><args>
+recv:
+    <action_letter><state_modifier><args>
+
+state_modifier can be either c (confirmed) or r (rejected)
+
+ping
+    send:
+        97
+        a<random sq of numbers len=6>
+    recv:
+        b<same sq of numbers len=6>
+join
+    send:
+        j<nick>
+        jReyuu
+    recv:
+        jc<id>
+        jr<id>
+disconnect
+    send:
+        d
+    recv:
+        dc<id>
+        dr
+position
+    send:
+        p<x>,<y>
+        p9999,9999
+    recv:
+        pc9999,9999
+        pr9999,9999
+firing vector
+    send:
+        f<w><h>
+        f1.453,-2.321
+    recv:
+        fc1.453,-2.321
+        fr1.453,-2.321
+item pickup
+    send:
+        i<id>,<qtty>
+        i32,1
+    recv:
+        ic<id><qtty>
+        ic32,1
+        ir32,1
+heal
+    send:
+        h<amount>
+        h5
+    recv:
+        hc5
+        hr5
