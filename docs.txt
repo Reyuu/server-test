@@ -45,10 +45,10 @@ firing vector
         fr1.453,-2.321
 item pickup
     send:
-        i<id>,<qtty>
+        i<id>,<slot>
         i32,1
     recv:
-        ic<id><qtty>
+        ic<id>,<slot>
         ic32,1
         ir32,1
 heal

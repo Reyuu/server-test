@@ -2,6 +2,22 @@ import socket
 import socketserver
 import threading
 
+class Item:
+    def __init__(self, x, y, typ, player=None, picked=False):
+        self.x = x
+        self.y = y
+        self.type = typ
+        self.picked = picked
+        #id
+        self.owner = player
+    
+    def pick(self, player):
+        self.x = -600
+        self.y = -600
+        self.owner = player
+        self.picked = True
+        return True
+
 class Player:
     def __init__(self, id, ip, nickname, x=0, y=0, hp=100):
         self.nickname = nickname
@@ -14,12 +30,20 @@ class Player:
         self.y_rate = 5
         self.hp = 100
 
+        self.inventory = {0:None, 1:None, 2:None,
+                          3:None, 4:None, 5:None,
+                          6:None, 7:None, 8:None}
+
 class GameInstance:
     def __init__(self):
         self.counter = -1
+        self.counter_items = 0
         self.players = {}
         self.ids_to_ips = {}
         self.ips_to_ids = {}
+        self.items = {}
+        #example item load
+        self.items.update({self.counter_items: Item(300, 400, 3)})
     
     def ping(self, s):
         b = bytes("b", "utf-8")
@@ -58,6 +82,33 @@ class GameInstance:
         except KeyError:
             pass
         return bytes("pr", "utf-8")+s
+    
+    def heal(self, s, ip):
+        try:
+            #no
+            s=0
+            self.players[self.ips_to_ids[ip]].hp += s
+            return bytes("hc%s" % s, "utf-8")
+        except KeyError:
+            pass
+        return bytes("hr", "utf-8")+s
+
+    def pick(self, s, ip):
+        try:
+            a = str(s).split(",")
+            player = self.players[self.ips_to_ids[ip]]
+            radius = 50
+            if player.x-50 < self.items[a[0]].x < player.x+50:
+                print("i")
+                if player.y-50 < self.items[a[0]].y < player.y+50:
+                    print("j")
+                    self.items[a[0]].pick(player)
+                    if not(player.inventory[int(a[1])] == None):
+                        player.inventory[int(a[1])].update({int(a[1]): self.items[a[0]]})
+                        return bytes("ic%s", "utf-8")+s
+        except KeyError:
+            pass
+        return bytes("ir", "utf-8")+s
 
 class Handler(socketserver.BaseRequestHandler):
     game = GameInstance()
@@ -88,6 +139,15 @@ class Handler(socketserver.BaseRequestHandler):
                 #pos
                 if modifier == 112:
                     x = self.game.update_pos(only_data, self.client_address[0])
+                    print(x)
+                    self.request.sendall(x)
+                #heal
+                if modifier == 104:
+                    x = self.game.heal(only_data, self.client_address[0])
+                    print(x)
+                    self.request.sendall(x)
+                if modifier == 105:
+                    x = self.game.pick(only_data, self.client_address[0])
                     print(x)
                     self.request.sendall(x)
         except IndexError:
