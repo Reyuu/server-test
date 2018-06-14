@@ -9,7 +9,8 @@ host, port = "localhost", 9999
 rand_int = random.randint(100000, 999999)
 nick = "Reyuu"
 print(rand_int, nick)
-data = ["a%s" % rand_int, "j%s" % nick, "p523,12", "d"]
+#data = ["a%s" % rand_int, "j%s" % nick, "p523,12", "d"]
+data = ["a%s" % rand_int, "j%s" % nick, "p523,12", "f1.453,-2.321", "d"]
 received_list = []
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -36,7 +37,7 @@ for i in data:
                 print("Disconnected correctly")
             if (received[1] == "r"):
                 print("Cannot disconnect")
-        if (received[0] == "j"):
+        if (received[0] == "p"):
             if (received[1] == "c"):
                 print("Position confirmed")
             if (received[1] == "r"):

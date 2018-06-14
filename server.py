@@ -3,9 +3,9 @@ import socketserver
 import threading
 
 class Player:
-    def __init__(self, id, ip, nickname, x=0, y=0, hp=100):
+    def __init__(self, id_, ip, nickname, x=0, y=0, hp=100):
         self.nickname = nickname
-        self.id = id
+        self.id = id_
         self.ip = ip
 
         self.x = 0
@@ -59,6 +59,15 @@ class GameInstance:
             pass
         return bytes("pr", "utf-8")+s
 
+    def firing_vector(self, vector, ip):
+        print("Vector: %s" % vector)
+        #w,h = vector.split(b',')
+        #print("%s|%s" % (w,h))
+        if ip in self.ips_to_ids.keys():
+            return bytes("fc%s" % vector, "utf-8")
+        else:
+            return bytes("fr%s" % vector, "utf-8")
+
 class Handler(socketserver.BaseRequestHandler):
     game = GameInstance()
     def handle(self):
@@ -90,6 +99,11 @@ class Handler(socketserver.BaseRequestHandler):
                     x = self.game.update_pos(only_data, self.client_address[0])
                     print(x)
                     self.request.sendall(x)
+                #firing_vector
+                if modifier == 102:
+                    x = self.game.firing_vector(only_data, self.client_address[0])
+                    print(x)
+                    self.request.sendall(x)
         except IndexError:
             pass
         print("Disconnected from %s" % self.client_address[0])
@@ -98,5 +112,6 @@ class Handler(socketserver.BaseRequestHandler):
 
 if __name__ == "__main__":
     host, port = "localhost", 9999
+    print("Server started!")
     server = socketserver.TCPServer((host, port), Handler)
     server.serve_forever()
