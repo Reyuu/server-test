@@ -102,7 +102,7 @@ class Communication():
     def firing_vector(self, w, h):
         pass
     
-    def item_pickup(self, id, slot):
+    def item_pickup(self, id_, slot):
         pass
     
     def heal(self, amount):
@@ -123,18 +123,28 @@ class Game(ezpygame.Scene):
     def handle_event(self, event):
         #join, disconnect, ping
         result = ""
-        if event.type == jointke:
-            result = self.communication.join(self.player.nickname)
+        if event.type == pygame.K_0:    #join
+            result = self.communication.join("Reyyy")
 
-        if event.type == disconnect:
+        if event.type == pygame.K_1:    #disconnect
             result = self.communication.disconnect()
 
-        if event.type == ping:
-            result = self.communication.ping()                                         
+        if event.type == pygame.K_2:          #ping
+            result = self.communication.ping()
 
-        if event.type == Position:
-            result = self.communication.position(self.pl)
-            
+        if event.type == pygame.K_3:      #Position
+            result = self.communication.position(50,50)
+
+        if event.type == pygame.K_4:    #disconnect
+            result = self.communication.firing_vector(2.006,3.696)
+
+        if event.type == pygame.K_5:          #ping
+            result = self.communication.item_pickup(2,1)
+
+        if event.type == pygame.K_6:      #Position
+            result = self.communication.heal(69)
+
+        print(result)
         pass
 
     def draw(self, screen):
