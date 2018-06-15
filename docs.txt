@@ -58,3 +58,33 @@ heal
     recv:
         hc5
         hr5
+
+player list
+    send:
+        l
+    recv:
+        max 24(?)
+        lc<player_id>,<player_id2>,[...]<player_idn>
+        lr
+get pos of a player (check if client can see them and then send pos)
+    send:
+        g<player_id>
+    recv:
+        gc<x>,<y>
+        gr<player_id>
+get nickname of a player
+    send:
+        n<player_id>
+    recv:
+        nc<player_nickname>
+        nr<player_id>
+check for events (player joined, disconnected, player's dead)
+    send:
+        c
+    recv:
+        cc<type><args>
+            a)join - cc0,<player_id>
+            b)disconnect - cc1,<player_id>
+            c)player killed - cc3,<player_id>
+            d) ... more if needed, possibly get all
+        cr
