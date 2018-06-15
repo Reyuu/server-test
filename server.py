@@ -118,9 +118,9 @@ class GameInstance:
         #w,h = vector.split(b',')
         #print("%s|%s" % (w,h))
         if ip in self.ips_to_ids.keys():
-            return bytes("fc%s" % vector, "utf-8")
+            return bytes("fc", "utf-8")+vector
         else:
-            return bytes("fr%s" % vector, "utf-8")
+            return bytes("fr", "utf-8")+vector
 
 class Handler(socketserver.BaseRequestHandler):
     game = GameInstance()
@@ -156,6 +156,8 @@ class Handler(socketserver.BaseRequestHandler):
                 #firing_vector
                 if modifier == 102:
                     x = self.game.firing_vector(only_data, self.client_address[0])
+                    print(x)
+                    self.request.sendall(x)
                 #heal
                 if modifier == 104:
                     x = self.game.heal(only_data, self.client_address[0])
