@@ -38,6 +38,7 @@ class GameInstance:
     def __init__(self):
         self.counter = -1
         self.counter_items = 0
+        self.max_slots = 24
         self.players = {}
         self.ids_to_ips = {}
         self.ips_to_ids = {}
@@ -51,15 +52,23 @@ class GameInstance:
         return bytes(b+s)
     
     def join(self, s, ip):
-        self.counter += 1
         #for i in self.players.keys():
         #    if self.players[i].ip == ip:
         if ip in self.ips_to_ids.keys():
             return bytes("jr%s" % self.ips_to_ids[ip], "utf-8")
-        self.players.update({self.counter: Player(self.counter, ip, s)})
-        self.ids_to_ips.update({self.counter: ip})
-        self.ips_to_ids.update({ip: self.counter})
-        return bytes("jc%s" % self.players[self.counter].id, "utf-8")
+        #self.counter += 1
+        id_= 0
+        print(self.players.keys())
+        for i in range(0, 24):
+            print(i)
+            print(i in self.players.keys())
+            if not(i in self.players.keys()):
+                id_ = i
+                break
+        self.players.update({id_: Player(id_, ip, s)})
+        self.ids_to_ips.update({id_: ip})
+        self.ips_to_ids.update({ip: id_})
+        return bytes("jc%s" % self.players[id_].id, "utf-8")
 
     def disconnect(self, ip):
         try:
@@ -70,10 +79,12 @@ class GameInstance:
             return bytes("dc%s" % temp_id, "utf-8")
         except ValueError:
             pass
+        except KeyError:
+            pass
         return bytes("dr", "utf-8")
 
     def update_pos(self, s, ip):
-        print(s)
+        #print(s)
         try:
             pos = str(s, "utf-8").split(",")
             id_ = self.ips_to_ids[ip]
@@ -101,12 +112,12 @@ class GameInstance:
             radius = 50
             id_, slot = int(a[0]), int(a[1])
             if player.x-radius < self.items[id_].x < player.x+radius:
-                print("i")
+                #print("i")
                 if player.y-radius < self.items[id_].y < player.y+radius:
-                    print("j")
+                    #print("j")
                     self.items[id_].pick(player)
                     if player.inventory[slot] == None:
-                        print("gowno")
+                        #print("gowno")
                         player.inventory.update({slot: self.items[id_]})
                         return bytes("ic", "utf-8")+s
         except KeyError:
@@ -128,11 +139,11 @@ class Handler(socketserver.BaseRequestHandler):
         try:
             while True:
                 self.data = self.request.recv(64)
-                print("%s's data: " % self.client_address[0])
-                print("\t%s" % self.data)
+                #print("%s's data: " % self.client_address[0])
+                #print("\t%s" % self.data)
                 modifier = self.data[0]
                 only_data = self.data[1:]
-                print(modifier, only_data)
+                #print(modifier, only_data)
                #ping
                 if modifier == 97:
                     x = self.game.ping(only_data)
@@ -151,7 +162,7 @@ class Handler(socketserver.BaseRequestHandler):
                 #pos
                 if modifier == 112:
                     x = self.game.update_pos(only_data, self.client_address[0])
-                    print(x)
+                    #print(x)
                     self.request.sendall(x)
                 #firing_vector
                 if modifier == 102:

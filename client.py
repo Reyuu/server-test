@@ -6,6 +6,7 @@ import time
 import pygame
 import ezpygame
 import threading
+import queue
 
 #client?
 
@@ -42,12 +43,48 @@ class Player:
                           3:None, 4:None, 5:None,
                           6:None, 7:None, 8:None}
 
-class Communication():
+class Communication(threading.Thread):
     def __init__(self, ip, port):
         self.ip, self.port = ip, port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((self.ip, self.port))
         self.rand_int = 0
+        self.queue = queue.Queue()
+        self.result_queue = queue.Queue()
+        self.counter = 0
+        threading.Thread.__init__(self)
+    
+    def on_thread(self, function, *args, **kwargs):
+        self.queue.put((function, args, kwargs))
+    
+    def get_result(self):
+        try:
+            return self.result_queue.get()
+        except queue.Empty:
+            return None
+
+    def run(self):
+        while True:
+            try:
+                function, args, kwargs = self.queue.get()
+                result = ""
+                try:
+                    if type(args[0]) is (tuple or list):
+                        result = function(*args[0], *kwargs)
+                except IndexError:
+                    result = function(*args, *kwargs)
+                if result == "":
+                    result = function(*args, *kwargs)
+                self.result_queue.put(result)
+            except queue.Empty:
+                self.idle()
+
+    def idle(self):
+        self.counter += 1
+        if self.counter >= 1000:
+            self.ping()
+            self.counter = 0
+        pass
 
     def ping(self):
         self.rand_int = random.randint(100000, 999999)
@@ -91,6 +128,7 @@ class Game(ezpygame.Scene):
     def __init__(self, nick):
         super().__init__()
         self.communication = Communication("localhost", 9999)
+        self.communication.start()
         self.player = Player(-1, nick, x=400, y=300)
         self.mouse_vector = [0,0]
 
@@ -117,7 +155,7 @@ class Game(ezpygame.Scene):
                 if (received[1] == "c"):
                     print("Disconnected correctly")
                     self.player.id = -1
-                    self.player.connect = False
+                    self.player.connected = False
                 if (received[1] == "r"):
                     print("Cannot disconnect")
             if (received[0] == "p"):
@@ -151,7 +189,8 @@ class Game(ezpygame.Scene):
 
     def update(self, dt):
         if self.player.connected:
-            result = self.communication.position(self.player.x+self.player.velocity_x, self.player.y+self.player.velocity_y)
+            self.communication.on_thread(self.communication.position, (self.player.x+self.player.velocity_x, self.player.y+self.player.velocity_y))
+            result = self.communication.result_queue.get()
             self.test_protocol(result)
 
     def handle_event(self, event):
@@ -194,25 +233,31 @@ class Game(ezpygame.Scene):
                     self.player.velocity_x += 1
         
             if event.key == pygame.K_0:    #join
-                result = self.communication.join(self.player.nickname)
+                self.communication.on_thread(self.communication.join, self.player.nickname)
+                result = self.communication.get_result()
 
             if event.key == pygame.K_1:    #disconnect
-                result = self.communication.disconnect()
-
+                self.communication.on_thread(self.communication.disconnect)
+                result = self.communication.get_result()
             if event.key == pygame.K_2:          #ping
-                result = self.communication.ping()
-
+                self.communication.on_thread(self.communication.ping)
+                result = self.communication.get_result()
             if event.key == pygame.K_3:      #Position
-                result = self.communication.position(50,50)
-
+                self.communication.on_thread(self.communication.position, self.player.x, self.player.y)
+                result = self.communication.get_result()
             if event.key == pygame.K_4:    #disconnect
-                result = self.communication.firing_vector(*self.mouse_vector)
-
+                #result = self.communication.firing_vector(*self.mouse_vector)
+                self.communication.on_thread(self.communication.firing_vector, *self.mouse_vector)
+                result = self.communication.get_result()
+            
             if event.key == pygame.K_5:          #ping
-                result = self.communication.item_pickup(2,1)
+                #result = self.communication.item_pickup(2,1)
+                self.communication.on_thread(self.communication.item_pickup, 2, 1)
+                result = self.communication.get_result()
 
             if event.key == pygame.K_6:      #Position
-                result = self.communication.heal(69)
+                self.communication.on_thread(self.communication.heal, 5)
+                result = self.communication.get_result()
 
         #print(result)
         self.test_protocol(result)
