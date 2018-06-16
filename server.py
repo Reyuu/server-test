@@ -135,10 +135,12 @@ class GameInstance:
 
     def player_list(self):
         if not(self.players.keys() == []):
-            return bytes("lc%s" % ",".join(self.players.keys()), "utf-8")
+            joined = ",".join(str(k) for k in self.players.keys())
+            return bytes("lc%s" % joined, "utf-8")
         return bytes("lr", "utf-8")
     
     def get_pos_of_a_player(self, id_):
+        id_ = int(id_)
         try:
             return bytes("gc%s,%s" % (self.players[id_].x, self.players[id_].y), "utf-8")
         except KeyError:
@@ -146,8 +148,9 @@ class GameInstance:
         return bytes("gr%s" % id_, "utf-8")
     
     def get_nickname_of_a_player(self, id_):
+        id_ = int(id_)
         try:
-            return bytes("nc%s" % self.players[id_].nickname, "utf-8")
+            return bytes("nc", "utf-8") + self.players[id_].nickname
         except KeyError:
             pass
         return bytes("nr%s" % id_, "utf-8")
@@ -162,11 +165,11 @@ class Handler(socketserver.BaseRequestHandler):
         try:
             while True:
                 self.data = self.request.recv(64)
-                print("%s's data: " % self.client_address[0])
-                print("\t%s" % self.data)
+                #print("%s's data: " % self.client_address[0])
+                #print("\t%s" % self.data)
                 modifier = self.data[0]
                 only_data = self.data[1:]
-                print(modifier, only_data)
+                #print(modifier, only_data)
                #ping
                 if modifier == 97:
                     x = self.game.ping(only_data)
@@ -208,12 +211,12 @@ class Handler(socketserver.BaseRequestHandler):
                     self.request.sendall(x)
                 #get pos of a player
                 if modifier == 103:
-                    x = self.game.get_pos_of_a_player(int(only_data[0]))
+                    x = self.game.get_pos_of_a_player(only_data)
                     print(x)
                     self.request.sendall(x)
                 #get nickname of a player
                 if modifier == 110:
-                    x = self.game.get_nickname_of_a_player(int(only_data[0]))
+                    x = self.game.get_nickname_of_a_player(only_data)
                     print(x)
                     self.request.sendall(x)
                 if modifier == 99:
