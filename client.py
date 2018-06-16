@@ -121,7 +121,26 @@ class Communication(threading.Thread):
         self.sock.sendall(bytes("h%s" % amount, "utf-8"))
         received = str(self.sock.recv(64), "utf-8")
         return received
+    
+    def player_list(self):
+        self.sock.sendall(bytes("l", "utf-8"))
+        received = str(self.sock.recv(64), "utf-8")
+        return received
+    
+    def get_pos_of_a_player(self, id):
+        self.sock.sendall(bytes("g%s" % id, "utf-8"))
+        received = str(self.sock.recv(64), "utf-8")
+        return received
+    
+    def get_nickname_of_a_player(self, id):
+        self.sock.sendall(bytes("n%s" % id, "utf-8"))
+        received = str(self.sock.recv(64), "utf-8")
+        return received
 
+    def check_for_events(self):
+        self.sock.sendall(bytes("c", "utf-8"))
+        received = str(self.sock.recv(64), "utf-8")
+        return received
 
 class Game(ezpygame.Scene):
     resolution = (800,600)
@@ -257,6 +276,22 @@ class Game(ezpygame.Scene):
 
             if event.key == pygame.K_6:      #Position
                 self.communication.on_thread(self.communication.heal, 5)
+                result = self.communication.get_result()
+
+            if event.key == pygame.K_7:      #player list
+                self.communication.on_thread(self.communication.player_list)
+                result = self.communication.get_result()
+            
+            if event.key == pygame.K_8:      #get pos of a player
+                self.communication.on_thread(self.communication.get_pos_of_a_player, 0)
+                result = self.communication.get_result()
+
+            if event.key == pygame.K_9:      #get nickname of a player
+                self.communication.on_thread(self.communication.get_nickname_of_a_player, 0)
+                result = self.communication.get_result()
+
+            if event.key == pygame.K_o:      #check for events
+                self.communication.on_thread(self.communication.check_for_events)
                 result = self.communication.get_result()
 
         #print(result)
