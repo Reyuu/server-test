@@ -1,0 +1,7 @@
+[16-06-2018 21:42:13] Server started!
+[16-06-2018 21:42:17] help
+Commands:
+Help
+ConnectedPlayers
+Exit
+
