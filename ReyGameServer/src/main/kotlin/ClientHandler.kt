@@ -54,7 +54,6 @@ class ClientHandler(
         //join
         if (modifier == 106.toByte()) {
             val x = game.join(onlyData, client.inetAddress.hostAddress)
-            window.display("${client.inetAddress.hostAddress} joined")
             //println(x)
             send(x)
         }

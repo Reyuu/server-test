@@ -8,7 +8,7 @@ class Game {
     private var ids_to_ips = HashMap<Int, String>()
     private var ips_to_ids = HashMap<String, Int>()
     private var items = HashMap<Int, Item>()
-    val commands = arrayListOf("Help","ConnectedPlayers","Exit")
+    val commands = arrayListOf("Help","Players","Exit")
 
     init {
         // test item
@@ -31,13 +31,15 @@ class Game {
         if(ips_to_ids.containsKey(ip)){
             return add.toByteArray() + ips_to_ids[ip].toString().toByteArray()
         }
-        var id = 0
+        //var id = 0
+        counter++
 
 
         players[counter] = Player(counter,ip,b)
         ids_to_ips[counter] = ip
         ips_to_ids[ip] = counter
         add = "jc"
+        window.display("$b joined")
         return add.toByteArray() + players[counter]!!.id.toString().toByteArray()
     }
 
@@ -120,11 +122,11 @@ class Game {
                     return output
                 }
                 1 -> {
-                    output += "Players (${players.size}):"
+                    output += "Players (${players.size}):\n"
                     players.forEach { _, u ->
                         output += u.nickname + "\n"
                     }
-                    return output
+                    return output + "\n"
                 }
                 2 -> {
                     server.stopServer(0)

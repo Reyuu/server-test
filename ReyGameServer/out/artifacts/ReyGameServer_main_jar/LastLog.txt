@@ -1,0 +1,17 @@
+[16-06-2018 22:50:31] Server started!
+[16-06-2018 22:50:45] help
+Commands:
+Help
+ConnectedPlayers
+Exit
+[16-06-2018 22:50:58] connectedplayers
+Players (0):[16-06-2018 22:54:04] Client connected: 127.0.0.1
+[16-06-2018 22:54:49] connectedplayers
+Players (0):[16-06-2018 22:55:08] ERROR!
+Exception in 127.0.0.1 client on update position:
+kotlin.KotlinNullPointerException
+[16-06-2018 22:55:08] ERROR!
+Exception in 127.0.0.1 client while receiving data:
+java.net.SocketException: Connection reset by peer: socket write error
+[16-06-2018 22:55:08] Connection closed for 127.0.0.1
+
