@@ -49,10 +49,7 @@ class Communication(threading.Thread):
     def __init__(self, ip, port):
         self.ip, self.port = ip, port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            self.sock.connect((self.ip, self.port))
-        except ConnectionRefusedError:
-            sys.exit(1)
+        self.sock.connect((self.ip, self.port))
         self.rand_int = 0
         self.queue = queue.Queue()
         self.result_queue = queue.Queue()
