@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 
 class ServerWindowController : Controller() {
     val history = SimpleStringProperty("")
-    val players = SimpleStringProperty("Players:\n")
+    val players = SimpleStringProperty("Players (0):\n")
     private val playersList = HashMap<String,String>()
 
     fun display(message:String){

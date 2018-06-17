@@ -17,8 +17,8 @@ class ServerWindow : View("ReyGame server") {
         playersList.bind(controller.players)
         commandsWindow.bind(controller.history)
         sendButton.setOnAction { send() }
-        commandsWindow.setOnKeyTyped {
-            commandsWindow.scrollTop = Double.MAX_VALUE
+        controller.history.onChange {
+            commandsWindow.positionCaret(commandsWindow.length)
         }
         commandLine.setOnKeyPressed {
             if(it.code == KeyCode.ENTER)

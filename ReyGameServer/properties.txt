@@ -1,5 +1,5 @@
+playerRateX=5
 port=9999
 tick=60
 bulletVelocity=24
-playerRateX=5
 playerRateY=5

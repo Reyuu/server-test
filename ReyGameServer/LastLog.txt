@@ -1,7 +1,35 @@
-[17-06-2018 16:01:29] File properties.txt loaded correctly!
-[17-06-2018 16:01:29] Server started on port 9999!
-[17-06-2018 16:01:35] Client connected: 127.0.0.1
-[17-06-2018 16:01:35] kk joined
-[17-06-2018 16:01:48] kk disconnected
-[17-06-2018 16:01:48] Connection closed for 127.0.0.1
+[17-06-2018 22:07:54] File properties.txt loaded correctly!
+[17-06-2018 22:07:54] Server started on port 9999!
+[17-06-2018 22:07:57] help
+Commands:
+di <player> = Displays current player inventory
+Help = Displays this message
+Kick <player> = Disconnects player from server
+Give <itemID> <player> = Gives item with entered id to player
+Exit = Shutdowns server
+Players = Displays players list
+[17-06-2018 22:07:58] help
+Commands:
+di <player> = Displays current player inventory
+Help = Displays this message
+Kick <player> = Disconnects player from server
+Give <itemID> <player> = Gives item with entered id to player
+Exit = Shutdowns server
+Players = Displays players list
+[17-06-2018 22:07:59] help
+Commands:
+di <player> = Displays current player inventory
+Help = Displays this message
+Kick <player> = Disconnects player from server
+Give <itemID> <player> = Gives item with entered id to player
+Exit = Shutdowns server
+Players = Displays players list
+[17-06-2018 22:07:59] help
+Commands:
+di <player> = Displays current player inventory
+Help = Displays this message
+Kick <player> = Disconnects player from server
+Give <itemID> <player> = Gives item with entered id to player
+Exit = Shutdowns server
+Players = Displays players list
 

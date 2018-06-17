@@ -1,3 +1,4 @@
+import tornadofx.*
 import kotlin.concurrent.thread
 
 
@@ -6,13 +7,19 @@ class Game {
     private var idsToIps = HashMap<Int, String>()
     private var ipsToIds = HashMap<String, Int>()
     private var items = HashMap<Int, Item>()
-    private val commands = arrayListOf("Help", "Players", "Kick <player>", "Exit")
+    private val commands = HashMap<String,String>()
     private val query = HashMap<String, List<String>>()
 
     var running = true
 
     init {
         // test item
+        commands["Help"] = "Displays this message"
+        commands["Exit"] = "Shutdowns server"
+        commands["Players"] = "Displays players list"
+        commands["Kick <player>"] = "Disconnects player from server"
+        commands["Give <itemID> <player>"] = "Gives item with entered id to player"
+        commands["di <player>"] = "Displays current player inventory"
         items[items.size] = Item(300, 400, 3)
         tickLoop()
     }
@@ -195,30 +202,36 @@ class Game {
     }
 
     fun processCommand(command_: String): String {
-        val command = command_.takeWhile { it.isLetterOrDigit() }
+        val command = command_.split(" ")
+        if(command.isEmpty())
+            return "Invalid Command\n"
         val transformCommands = ArrayList<String>()
-        commands.forEach { transformCommands += it.toLowerCase().takeWhile { it.isLetterOrDigit() } }
-        if (transformCommands.contains(command.toLowerCase())) {
+        commands.forEach { transformCommands += it.key.toLowerCase().takeWhile { it.isLetterOrDigit() } }
+        if (transformCommands.contains(command[0].toLowerCase())) {
             var output = ""
-            when (transformCommands.indexOf(command.toLowerCase())) {
-                0 -> {
+            when (command[0].toLowerCase()) {
+                "help" -> {
                     output += "Commands:\n"
-                    commands.forEach { output += it + "\n" }
+                    commands.forEach { t, u ->
+                        output += "$t = $u\n"
+                    }
                     return output
                 }
-                1 -> {
+                "exit" -> {
+                    server.stopServer(0)
+                    return "Server is shutting down!\n"
+                }
+                "players" -> {
                     output += "Players (${players.size}):\n"
                     players.forEach { _, u ->
                         output += u.nickname + "\n"
                     }
                     return output + "\n"
                 }
-                2 -> {
-                    output = command_.dropWhile { it.isLetterOrDigit() }
-                    output = output.trim()
+                "kick" -> {
                     var id = -1
                     players.forEach { _, u ->
-                        if (u.nickname == output) {
+                        if (u.nickname == command[1]) {
                             id = u.id
                             return@forEach
                         }
@@ -233,9 +246,53 @@ class Game {
                     else
                         return "Invalid user"
                 }
-                3 -> {
-                    server.stopServer(0)
-                    return "Server is shutting down!\n"
+                "give" -> {
+                    if(!command[1].isInt())
+                        return "Invalid item id!\n"
+                    if(!items.containsKey(command[1].toInt()))
+                        return "Item with id ${command[1]} doesn't exist!\n"
+                    var id = -1
+                    players.forEach { t, u ->
+                        if(u.nickname == command[2]){
+                            id = t
+                            return@forEach
+                        }
+                    }
+                    if(id < 0)
+                        return "Player ${command[2]} doesn't exist!\n"
+
+                    var slot = -1
+                    players[id]?.inventory?.forEach { t, u ->
+                        if(u == null){
+                            slot = t
+                            return@forEach
+                        }
+                    }
+                    if(slot < 0)
+                        return "Player ${command[2]} doesn't have empty space in inventory!\n"
+
+                    players[id]!!.inventory[slot] = items[command[1].toInt()]
+                    return "Player ${command[2]} received item with id ${command[1]}"
+                }
+                "di" -> {
+                    var id = -1
+                    players.forEach { t, u ->
+                        if(u.nickname == command[1]){
+                            id = t
+                            output += "${u.nickname}'s inventory:\n"
+                            u.inventory.forEach { t, u ->
+                                if(u == null)
+                                    output += "$t = none\n"
+                                else
+                                    output += "$t = $u\n"
+                            }
+                            return@forEach
+                        }
+                    }
+                    return if(id < 0)
+                        "Player ${command[1]} doesn't exist!\n"
+                    else
+                        output
                 }
             }
         }
