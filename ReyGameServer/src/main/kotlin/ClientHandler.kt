@@ -7,86 +7,115 @@ class ClientHandler(
         private val id : Int){
     private val reader = Scanner(client.getInputStream())
     private val writer : OutputStream = client.getOutputStream()
-    private var running = false
+    private var running = true
 
     fun start() {
-        running = true
         try {
             while (running) {    // client loop
                 if (reader.hasNextLine()) {
                     val text = reader.nextLine()
                     if(handler(text)){
-                        close()
+                        client.close()
                     }
-                    println("Recived: $text")
+                    println("Received: $text")
                 }
-                client.keepAlive
                 if (client.isClosed || !client.isConnected)
-                    close()
+                    running = false
             }
         } catch (e: Exception) {
-            if(!e.toString().contains("Cocket is closed",true))
-                window.display(">>>Exception in ${client.inetAddress.hostAddress} client while receiving data:\n$e")
+            if(!(e.toString().contains("Socket is closed",true) || e.toString().contains("Socket closed",true)))
+                window.display(">>>Exception while ${client.inetAddress.hostAddress} client receiving data:\n$e")
         }
         close()
     }
 
     private fun send(message : ByteArray){
-        writer.write(message)
+        try {
+            writer.write(message)
+        } catch (e: Exception) {
+            if(!(e.toString().contains("Socket is closed",true) || e.toString().contains("Socket closed",true)))
+                window.display(">>>Exception while sending ${client.inetAddress.hostAddress} client data:\n$e")
+        }
     }
 
     fun close(){
         running = false
-        client.close()
+        send("dc".toByteArray())
+        if(!client.isClosed)
+            client.close()
+        window.playerUpdate("", client.inetAddress.hostAddress, false)
         window.display("Connection closed for ${client.inetAddress.hostAddress}")
-        clients.remove(id)
+        server.clients.remove(id)
     }
 
     private fun handler(message : String) : Boolean {
         val modifier = message[0].toByte()
         val onlyData = message.drop(1)//message.copyOfRange(1, message.size)
+        val x : ByteArray
         //ping
-        if (modifier == 97.toByte()) {
-            val x = game.ping(onlyData)
-            //println(x)
-            send(x)
-        }
+        when (modifier) {
+            97.toByte() -> {
+                x = server.game.ping(onlyData)
+                //println(x)
+                send(x)
+            }
+
         //join
-        if (modifier == 106.toByte()) {
-            val x = game.join(onlyData, client.inetAddress.hostAddress)
-            //println(x)
-            send(x)
-        }
+            106.toByte() -> {
+                x = server.game.join(onlyData, client.inetAddress.hostAddress)
+                //println(x)
+                send(x)
+            }
         //disconnect
-        if (modifier == 100.toByte()) {
-            val x = game.disconnect(client.inetAddress.hostAddress)
-            //println(x)
-            send(x)
-            return true
-        }
+            100.toByte() -> {
+                x = server.game.disconnect(client.inetAddress.hostAddress)
+                //println(x)
+                send(x)
+                return true
+            }
         //pos
-        if (modifier == 112.toByte()) {
-            val x = game.updatePos(onlyData, client.inetAddress.hostAddress)
-            //println(x)
-            send(x)
-        }
+            112.toByte() -> {
+                x = server.game.updatePos(onlyData, client.inetAddress.hostAddress)
+                //println(x)
+                send(x)
+            }
         //firing_vector
-        if (modifier == 102.toByte()) {
-            val x = game.firingVector(onlyData, client.inetAddress.hostAddress)
-            //println(x)
-            send(x)
-        }
+            102.toByte() -> {
+                x = server.game.firingVector(onlyData, client.inetAddress.hostAddress)
+                //println(x)
+                send(x)
+            }
         //heal
-        if (modifier == 104.toByte()) {
-            val x = game.heal(onlyData, client.inetAddress.hostAddress)
-            //println(x)
-            send(x)
+            104.toByte() -> {
+                x = server.game.heal(onlyData, client.inetAddress.hostAddress)
+                //println(x)
+                send(x)
+            }
+            //pick item
+            105.toByte() -> {
+                x = server.game.pick(onlyData, client.inetAddress.hostAddress)
+                //println(x)
+                send(x)
+            }
+            //players list
+            108.toByte() -> {
+                x = server.game.playerList()
+                send(x)
+            }
+            103.toByte() -> {
+                x = server.game.getPosOfaPlayer(onlyData)
+                send(x)
+            }
+            110.toByte() -> {
+                x = server.game.getNicknameOfaPlayer(onlyData)
+                send(x)
+            }
+            99.toByte() -> {
+                x = server.game.checkForEvents()
+                send(x)
+            }
         }
-        if (modifier == 105.toByte()) {
-            val x = game.pick(onlyData, client.inetAddress.hostAddress)
-            //println(x)
-            send(x)
-        }
+
         return false
     }
 }

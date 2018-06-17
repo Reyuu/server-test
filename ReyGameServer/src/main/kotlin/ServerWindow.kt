@@ -7,14 +7,16 @@ import tornadofx.*
 
 class ServerWindow : View("ReyGame server") {
     override val root : BorderPane by fxml("/views/ServerWindow.fxml")
-    val controller = window
+    private val controller = window
     private val commandsWindow : TextArea by fxid("serverCommands")
-    private val sendButon : Button by fxid("serverSendButton")
+    private val sendButton : Button by fxid("serverSendButton")
     private val commandLine : TextField by fxid("serverCommandLine")
+    private val playersList : TextArea by fxid("serverPlayersList")
 
     init {
-        commandsWindow.bind(controller.History)
-        sendButon.setOnAction { send() }
+        playersList.bind(controller.players)
+        commandsWindow.bind(controller.history)
+        sendButton.setOnAction { send() }
         commandsWindow.setOnKeyTyped {
             commandsWindow.scrollTop = Double.MAX_VALUE
         }
@@ -25,8 +27,8 @@ class ServerWindow : View("ReyGame server") {
     }
 
     private fun send(){
-        controller.History += "${controller.getTime()} ${commandLine.text}\n"
-        controller.History += game.processCommand(commandLine.text)
+        controller.history += "${controller.getTime()} ${commandLine.text}\n"
+        controller.history += server.game.processCommand(commandLine.text)
 
         commandLine.clear()
         controller.save()

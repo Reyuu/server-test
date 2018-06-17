@@ -1,13 +1,7 @@
-[16-06-2018 23:06:05] Server started!
-[16-06-2018 23:06:16] Client connected: 127.0.0.1
-[16-06-2018 23:06:16] kjkj joined
-[16-06-2018 23:06:23] players
-Players (1):
-kjkj
-
-[16-06-2018 23:06:28] exit
-[16-06-2018 23:06:28] Connection closed for 127.0.0.1
-[16-06-2018 23:06:28] ERROR!
-Exception in 127.0.0.1 client while receiving data:
-java.net.SocketException: Socket is closed
+[17-06-2018 16:01:29] File properties.txt loaded correctly!
+[17-06-2018 16:01:29] Server started on port 9999!
+[17-06-2018 16:01:35] Client connected: 127.0.0.1
+[17-06-2018 16:01:35] kk joined
+[17-06-2018 16:01:48] kk disconnected
+[17-06-2018 16:01:48] Connection closed for 127.0.0.1
 

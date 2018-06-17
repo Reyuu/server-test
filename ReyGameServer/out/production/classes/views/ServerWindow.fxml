@@ -7,15 +7,18 @@
 <?import javafx.scene.layout.HBox?>
 
 <BorderPane prefHeight="483.0" prefWidth="613.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <TextArea fx:id="serverCommands" editable="false" prefHeight="322.0" prefWidth="407.0" BorderPane.alignment="CENTER" />
+   </center>
+   <left>
+      <TextArea fx:id="serverPlayersList" editable="false" prefHeight="478.0" prefWidth="122.0" BorderPane.alignment="CENTER" />
+   </left>
    <bottom>
-      <HBox fx:id="serverHBox" prefHeight="27.0" prefWidth="243.0" BorderPane.alignment="CENTER">
+      <HBox prefHeight="29.0" prefWidth="613.0" BorderPane.alignment="CENTER">
          <children>
-            <TextField fx:id="serverCommandLine" prefHeight="27.0" prefWidth="148.0" HBox.hgrow="ALWAYS" />
-            <Button fx:id="serverSendButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="97.0" text="Send" />
+            <Button fx:id="serverSendButton" mnemonicParsing="false" prefHeight="29.0" prefWidth="147.0" text="Send" />
+            <TextField fx:id="serverCommandLine" prefHeight="34.0" prefWidth="516.0" />
          </children>
       </HBox>
    </bottom>
-   <center>
-      <TextArea fx:id="serverCommands" prefHeight="322.0" prefWidth="407.0" BorderPane.alignment="CENTER" />
-   </center>
 </BorderPane>

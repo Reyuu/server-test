@@ -5,24 +5,39 @@ import java.time.LocalDateTime
 
 
 class ServerWindowController : Controller() {
-    val History : SimpleStringProperty
-
-    init {
-        History = SimpleStringProperty("${getTime()} Server started!\n")
-    }
+    val history = SimpleStringProperty("")
+    val players = SimpleStringProperty("Players:\n")
+    private val playersList = HashMap<String,String>()
 
     fun display(message:String){
         if(message.take(3).contains(">>>"))
-            History += "${getTime()} ERROR!\n${message.drop(3)}\n"
+            history += "${getTime()} ERROR!\n${message.drop(3)}\n"
         else
-            History += "${getTime()} $message\n"
+            history += "${getTime()} $message\n"
         save()
     }
 
     fun save(){
         File("LastLog.txt").printWriter().use { out ->
-            History.get().split("\n").forEach {
+            history.get().split("\n").forEach {
                 out.println(it)
+            }
+        }
+    }
+
+    fun playerUpdate(nickname : String = "", ip : String, connected : Boolean) {
+        if(ip.isNotBlank()) {
+            if (connected) {
+                playersList[ip] = nickname
+                var newPlayersList = "Players (${playersList.size}):\n"
+                playersList.forEach { newPlayersList += "${it.value}\n" }
+                players.set(newPlayersList)
+            }
+            else {
+                playersList.remove(ip)
+                var newPlayersList = "Players (${playersList.size}):\n"
+                playersList.forEach { newPlayersList += "${it.value}\n" }
+                players.set(newPlayersList)
             }
         }
     }
